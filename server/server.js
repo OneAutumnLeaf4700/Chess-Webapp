@@ -18,6 +18,12 @@ const io = socket(server);
 // Use port info from config file
 const port = 3000;
 
+//MongoDB Database Setup
+dbHandler();
+
+// Server communication using io.js file
+ioHandler(io);
+
 // Serve static files
 app.use(express.static(path.join(__dirname, '../client')));
 
