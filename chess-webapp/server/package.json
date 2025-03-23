@@ -9,5 +9,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "mongoose": "^8.12.2",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1"
+  }
 }
