@@ -8,4 +8,18 @@ module.exports = (app) => {
         res.sendFile(path.join(clientPath, 'menu', 'mainmenu', 'mainmenu.html'));
     });
     
+    // Route for singleplayer
+    app.get('/singleplayer', (req, res) => {
+        res.sendFile(path.join(clientPath, 'menu', 'singleplayer', 'singleplayer.html'));
+    });
+
+    //Route for multiplayer
+    app.get('/multiplayer', (req, res) => {
+        res.sendFile(path.join(clientPath, 'menu', 'multiplayer', 'multiplayer.html'));
+    });
+
+    // Route for game
+    app.get('/game/:gameId', (req, res) => {
+        res.sendFile(path.join(clientPath, 'game', 'index.html')); 
+    });
 };
