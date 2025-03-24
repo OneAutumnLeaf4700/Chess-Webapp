@@ -22,4 +22,5 @@ module.exports = (app) => {
     app.get('/game/:gameId', (req, res) => {
         res.sendFile(path.join(clientPath, 'game', 'index.html')); // Serve the game.html file
     });
+    
 };
