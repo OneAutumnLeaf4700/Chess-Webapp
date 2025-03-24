@@ -4,17 +4,10 @@ module.exports = (app) => {
     const clientPath = path.join(__dirname, '../client');
 
     // Default Route (Main Menu)
-    /*
     app.get('/', (req, res) => {
         res.sendFile(path.join(clientPath, 'menu', 'mainmenu', 'mainmenu.html'));
     });
-    */
     
-    // Route for game
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(clientPath, 'game', 'index.html')); // Serve the game.html file
-    });
-
     // Route for singleplayer
     app.get('/singleplayer', (req, res) => {
         res.sendFile(path.join(clientPath, 'menu', 'singleplayer', 'singleplayer.html'));
