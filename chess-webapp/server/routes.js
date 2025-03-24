@@ -20,7 +20,7 @@ module.exports = (app) => {
 
     // Route for game
     app.get('/game/:gameId', (req, res) => {
-        res.sendFile(path.join(clientPath, 'game', 'index.html')); // Serve the game.html file
+        res.sendFile(path.join(clientPath, 'game', 'index.html'));
     });
-    
+
 };

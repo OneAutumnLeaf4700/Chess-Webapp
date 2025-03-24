@@ -16,7 +16,10 @@ const server = http.createServer(app);
 const io = socket(server);
 
 // Use port info from config file
-const port = config.port;
+const port = 3000;
+
+//MongoDB Database Setup
+dbHandler();
 
 // Server communication using io.js file
 ioHandler(io);
