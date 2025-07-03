@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Lemon&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/menu/assets/css/theme.css">
+    <link rel="stylesheet" href="/menu/multiplayer/multiplayer.css">
+</head>
+<body>
+    <div class="menu-container">
+        <h1>Multiplayer</h1>
+        <button id="create-game-btn" class="menu-btn">Create Game</button>
+        <button id="join-game-btn" class="menu-btn">Join Game</button>
+    </div>
+
+    <!-- Modal for entering Game ID -->
+    <div id="join-game-modal" class="modal">
+        <div class="modal-content">
+            <h2>Join a Game</h2>
+            <p>Enter the Game ID:</p>
+            <input type="text" id="game-id-input" placeholder="Game ID">
+            <div class="modal-buttons">
+                <button id="join-game-confirm-btn" class="menu-btn">Join</button>
+                <button id="cancel-btn" class="menu-btn">Cancel</button>
+            </div>
+            <p id="error-message" class="error-message"></p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/menu/multiplayer/multiplayer.js"></script>
+
+</body>
+</html>
