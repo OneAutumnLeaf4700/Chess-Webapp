@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singleplayer Chess</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Lemon&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/menu/assets/css/theme.css">
+    <link rel="stylesheet" href="/menu/singleplayer/singleplayer.css">
+</head>
+<body>
+    <div class="menu-container">
+        <h1>Singleplayer Chess</h1>
+        <div class="difficulty-selection">
+            <h2>Select Difficulty</h2>
+            <div class="button-container">
+                <button class="difficulty-btn" data-difficulty="1" aria-label="Easy difficulty">
+                    <span class="btn-icon" aria-hidden="true">🌱</span>
+                    Easy
+                </button>
+                <button class="difficulty-btn" data-difficulty="3" aria-label="Medium difficulty">
+                    <span class="btn-icon" aria-hidden="true">🌿</span>
+                    Medium
+                </button>
+                <button class="difficulty-btn" data-difficulty="5" aria-label="Hard difficulty">
+                    <span class="btn-icon" aria-hidden="true">🌳</span>
+                    Hard
+                </button>
+            </div>
+        </div>
+        
+        <div class="color-selection">
+            <h2>Choose Your Color</h2>
+            <div class="button-container">
+                <button class="color-btn" data-color="white" aria-label="Play as White">
+                    <span class="btn-icon" aria-hidden="true">♔</span>
+                    White
+                </button>
+                <button class="color-btn" data-color="black" aria-label="Play as Black">
+                    <span class="btn-icon" aria-hidden="true">♚</span>
+                    Black
+                </button>
+                <button class="color-btn" data-color="random" aria-label="Random color">
+                    <span class="btn-icon" aria-hidden="true">🎲</span>
+                    Random
+                </button>
+            </div>
+        </div>
+        
+        <button id="start-game-btn" class="menu-btn start-btn" disabled aria-label="Start Game">
+            Start Game
+        </button>
+        
+        <button id="back-btn" class="menu-btn back-btn" aria-label="Back to Main Menu">
+            ← Back to Menu
+        </button>
+    </div>
+
+    <script src="/menu/singleplayer/singleplayer.js"></script>
+</body>
+</html>
