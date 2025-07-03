@@ -153,6 +153,13 @@ socket.on('gameOverDisconnect', () => {
   updateStatus();
 });
 
+// Listen for opponent resignation
+socket.on('opponentResigned', (data) => {
+  gameOver = true;
+  $status.html(data.message);
+  openGameEndPopup(data.message);
+});
+
 
 // -------------------------------
 // Socket Functions
@@ -266,6 +273,38 @@ function playSound(move) {
 // Send the move to the server
 function sendMoveToServer(gameId, gameState) {
   socket.emit('move', gameId, gameState); // Emit the move to the server
+}
+
+// Handle game resignation
+function resignGame() {
+  if (gameOver) {
+    return; // Game is already over
+  }
+  
+  // Mark game as over and disable board interaction
+  gameOver = true;
+  
+  // Disable the resign button
+  const resignButton = document.getElementById('resign-btn');
+  resignButton.disabled = true;
+  resignButton.textContent = 'Resigned';
+  
+  // Determine the winner based on who resigned
+  const winner = myColor === 'white' ? 'Black' : 'White';
+  const resignationMessage = `${myColor === 'white' ? 'White' : 'Black'} resigned. ${winner} wins!`;
+  
+  // Update the game status
+  $status.html(resignationMessage);
+  
+  // Emit resignation to server for multiplayer sync
+  socket.emit('resignation', gameId, {
+    resignedPlayer: myColor,
+    winner: winner.toLowerCase(),
+    message: resignationMessage
+  });
+  
+  // Show game end popup
+  openGameEndPopup(resignationMessage);
 }
 
 // Function to change piece theme
@@ -585,6 +624,13 @@ document.getElementById('chesscom-btn').addEventListener('click', () => {
 //Exit Game End Popup
 gameEndPopupExitButton.addEventListener("click", () => {
   handleEscapeKeyForGameEndPopup({ key: 'Escape' });
+});
+
+// Resign button functionality
+document.getElementById('resign-btn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to resign? This will end the game.')) {
+    resignGame();
+  }
 });
 
 
