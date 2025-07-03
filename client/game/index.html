@@ -23,6 +23,30 @@
         <label>Status:</label>
         <div id="status"></div>
         
+        <label>Timer:</label>
+        <div class="timer-container">
+            <div class="timer-display">
+                <div class="player-timer white-timer">
+                    <div class="timer-label">White</div>
+                    <div class="timer-time" id="white-time">10:00</div>
+                    <div class="timer-indicator" id="white-indicator"></div>
+                </div>
+                <div class="timer-controls">
+                    <button id="timer-pause" class="timer-btn" title="Pause Timer">
+                        <img src="../img/icons/pause-icon.png" alt="Pause" class="timer-icon">
+                    </button>
+                    <button id="timer-settings" class="timer-btn" title="Timer Settings">
+                        <img src="../img/icons/settings-icon.png" alt="Settings" class="timer-icon">
+                    </button>
+                </div>
+                <div class="player-timer black-timer">
+                    <div class="timer-label">Black</div>
+                    <div class="timer-time" id="black-time">10:00</div>
+                    <div class="timer-indicator" id="black-indicator"></div>
+                </div>
+            </div>
+        </div>
+        
         <label>FEN:</label>
         <div class="fen-container">
           <div id="fen"></div>

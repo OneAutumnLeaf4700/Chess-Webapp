@@ -52,6 +52,12 @@
     --button-bg: #4a90e2;
     --button-hover: #357abd;
     --button-text: white;
+    --timer-bg: #f8f9fa;
+    --timer-text: #2c3e50;
+    --timer-border: #e9ecef;
+    --timer-active: #28a745;
+    --timer-warning: #ffc107;
+    --timer-danger: #dc3545;
 }
 
 /* 
@@ -71,6 +77,12 @@
     --button-bg: #404040;
     --button-hover: #505050;
     --button-text: #e0e0e0;
+    --timer-bg: #2c2c2c;
+    --timer-text: #e0e0e0;
+    --timer-border: #404040;
+    --timer-active: #28a745;
+    --timer-warning: #ffc107;
+    --timer-danger: #dc3545;
 }
 
 /* 
@@ -600,6 +612,172 @@ Game Outcome Popup
         width: 35px;
         height: 35px;
     }
+}
+
+/* 
+**************************************************************
+* Chess Timer Styles
+**************************************************************
+*/
+
+.chess-timer {
+  background: var(--timer-bg);
+  border: 2px solid var(--timer-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.timer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--status-bg);
+  border: 1px solid var(--timer-border);
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.timer-display.active {
+  border-color: var(--timer-active);
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.timer-display.warning {
+  border-color: var(--timer-warning);
+  background: rgba(255, 193, 7, 0.1);
+  animation: timerPulse 1s infinite;
+}
+
+.timer-display.danger {
+  border-color: var(--timer-danger);
+  background: rgba(220, 53, 69, 0.1);
+  animation: timerPulse 0.5s infinite;
+}
+
+.timer-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--timer-text);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timer-time {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--timer-text);
+  font-family: 'Monaco', 'Courier New', monospace;
+  text-align: center;
+  min-width: 100px;
+}
+
+.timer-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--timer-border);
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.timer-display.active .timer-indicator {
+  background: var(--timer-active);
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timer-control-btn {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.timer-control-btn:hover {
+  background: var(--button-hover);
+  transform: translateY(-1px);
+}
+
+.timer-control-btn:active {
+  transform: translateY(0);
+}
+
+.timer-control-btn img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1); /* Make icons white */
+}
+
+[data-theme="dark"] .timer-control-btn img {
+  filter: brightness(0) invert(1); /* Keep icons white in dark theme */
+}
+
+@keyframes timerPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Responsive design for timer */
+@media (max-width: 768px) {
+  .chess-timer {
+    padding: 1rem;
+  }
+  
+  .timer-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .timer-display {
+    min-width: 200px;
+  }
+  
+  .timer-time {
+    font-size: 1.5rem;
+  }
+  
+  .timer-controls {
+    gap: 0.5rem;
+  }
+  
+  .timer-control-btn {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .timer-control-btn img {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 /* 
