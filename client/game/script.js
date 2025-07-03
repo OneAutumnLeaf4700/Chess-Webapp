@@ -54,6 +54,14 @@ let opponentDisconnected = false;
 let whiteSquareGrey = '#a9a9a9'
 let blackSquareGrey = '#696969'
 
+// Timer variables
+let whiteTimeLeft = 600; // 10 minutes in seconds
+let blackTimeLeft = 600; // 10 minutes in seconds
+let timerInterval = null;
+let timerRunning = false;
+let currentTimerColor = 'white';
+let timeIncrement = 0; // Fischer increment in seconds
+
 const icons = {
   light: '../img/copyicon/copy-icon-light.png',
   dark: '../img/copyicon/copy-icon-dark.png'
@@ -144,6 +152,9 @@ socket.on('opponentMove', (move) => {
   board.position(game.fen()); //Update the board position
   playSound(move); // Play the corresponding sound
   updateStatus(); //Update the game status
+  
+  // Switch timer after opponent move
+  switchTimer();
 });
 
 // Listen for the game over disconnect event
@@ -378,6 +389,9 @@ async function onDrop(source, target) {
 
   // Update the website labels
   updateStatus();
+  
+  // Switch timer after move
+  switchTimer();
 
   // Check outcome of the game
   outcome = checkOutcome(game);
@@ -768,3 +782,187 @@ function updatePromotionModal(set) {
     button.querySelector('img').src = newImageSrc;
   });
 };
+
+// -------------------------------
+// Chess Timer Functions
+// -------------------------------
+
+// Format time in MM:SS format
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Update timer display
+function updateTimerDisplay() {
+  const whiteTimeElement = document.getElementById('white-time');
+  const blackTimeElement = document.getElementById('black-time');
+  
+  if (whiteTimeElement && blackTimeElement) {
+    whiteTimeElement.textContent = formatTime(whiteTimeLeft);
+    blackTimeElement.textContent = formatTime(blackTimeLeft);
+    
+    // Update danger/warning states
+    updateTimerStates();
+  }
+}
+
+// Update timer states (warning/danger)
+function updateTimerStates() {
+  const whiteTimer = document.getElementById('white-timer');
+  const blackTimer = document.getElementById('black-timer');
+  
+  if (whiteTimer && blackTimer) {
+    // Remove existing warning/danger classes
+    whiteTimer.classList.remove('warning', 'danger');
+    blackTimer.classList.remove('warning', 'danger');
+    
+    // Add appropriate classes based on time remaining
+    if (whiteTimeLeft <= 10) {
+      whiteTimer.classList.add('danger');
+    } else if (whiteTimeLeft <= 30) {
+      whiteTimer.classList.add('warning');
+    }
+    
+    if (blackTimeLeft <= 10) {
+      blackTimer.classList.add('danger');
+    } else if (blackTimeLeft <= 30) {
+      blackTimer.classList.add('warning');
+    }
+  }
+}
+
+// Update active timer indicator
+function updateActiveTimer() {
+  const whiteTimer = document.getElementById('white-timer');
+  const blackTimer = document.getElementById('black-timer');
+  
+  if (whiteTimer && blackTimer) {
+    whiteTimer.classList.remove('active');
+    blackTimer.classList.remove('active');
+    
+    if (timerRunning) {
+      if (currentTimerColor === 'white') {
+        whiteTimer.classList.add('active');
+      } else {
+        blackTimer.classList.add('active');
+      }
+    }
+  }
+}
+
+// Start the timer
+function startTimer() {
+  if (timerRunning) return;
+  
+  timerRunning = true;
+  currentTimerColor = game.turn() === 'w' ? 'white' : 'black';
+  
+  updateActiveTimer();
+  
+  timerInterval = setInterval(() => {
+    if (currentTimerColor === 'white') {
+      whiteTimeLeft--;
+      if (whiteTimeLeft <= 0) {
+        whiteTimeLeft = 0;
+        handleTimeOut('white');
+        return;
+      }
+    } else {
+      blackTimeLeft--;
+      if (blackTimeLeft <= 0) {
+        blackTimeLeft = 0;
+        handleTimeOut('black');
+        return;
+      }
+    }
+    
+    updateTimerDisplay();
+  }, 1000);
+}
+
+// Stop the timer
+function stopTimer() {
+  if (!timerRunning) return;
+  
+  timerRunning = false;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  
+  updateActiveTimer();
+}
+
+// Switch timer to the other player
+function switchTimer() {
+  if (!timerRunning) return;
+  
+  // Add increment to the player who just moved
+  if (currentTimerColor === 'white') {
+    whiteTimeLeft += timeIncrement;
+  } else {
+    blackTimeLeft += timeIncrement;
+  }
+  
+  // Switch to the other player
+  currentTimerColor = game.turn() === 'w' ? 'white' : 'black';
+  
+  updateActiveTimer();
+  updateTimerDisplay();
+}
+
+// Handle time out
+function handleTimeOut(color) {
+  stopTimer();
+  
+  const winner = color === 'white' ? 'Black' : 'White';
+  const status = `${winner} wins on time!`;
+  
+  gameOver = true;
+  openGameEndPopup(status);
+}
+
+// Pause/Resume timer
+function toggleTimer() {
+  if (timerRunning) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+}
+
+// Reset timer
+function resetTimer() {
+  stopTimer();
+  whiteTimeLeft = 600; // Reset to 10 minutes
+  blackTimeLeft = 600; // Reset to 10 minutes
+  currentTimerColor = 'white';
+  updateTimerDisplay();
+  updateActiveTimer();
+}
+
+// Initialize timer display
+function initializeTimer() {
+  updateTimerDisplay();
+  updateActiveTimer();
+}
+
+// Timer event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  initializeTimer();
+  
+  // Pause/Resume button
+  const pauseButton = document.getElementById('timer-pause');
+  if (pauseButton) {
+    pauseButton.addEventListener('click', toggleTimer);
+  }
+  
+  // Settings button (placeholder for future implementation)
+  const settingsButton = document.getElementById('timer-settings');
+  if (settingsButton) {
+    settingsButton.addEventListener('click', () => {
+      // Placeholder for timer settings modal
+      console.log('Timer settings not implemented yet');
+    });
+  }
+});
