@@ -684,3 +684,63 @@ Game Outcome Popup
     padding: 0.75rem 1rem;
   }
 }
+
+/* 
+**************************************************************
+* Resign Button Styles
+**************************************************************
+*/
+
+.resign-btn {
+  padding: 0.75rem 1.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.resign-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.resign-btn:active {
+  transform: translateY(0);
+}
+
+.resign-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dark theme adjustments for resign button */
+[data-theme="dark"] .resign-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+[data-theme="dark"] .resign-btn:hover {
+  background: #c0392b;
+}
+
+[data-theme="dark"] .resign-btn:disabled {
+  background: #7f8c8d;
+  color: #95a5a6;
+}
+
+/* Responsive design for resign button */
+@media (max-width: 768px) {
+  .resign-btn {
+    min-width: 150px;
+    padding: 0.75rem 1rem;
+  }
+}
