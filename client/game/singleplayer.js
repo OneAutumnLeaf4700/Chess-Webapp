@@ -613,11 +613,11 @@ document.getElementById('chesscom-btn').addEventListener('click', () => {
 
 // New game button
 document.getElementById('new-game-btn').addEventListener('click', () => {
-  window.location.reload();
+  window.location.href = '/menu/singleplayer/singleplayer.html';
 });
 
 document.getElementById('new-game-popup-btn').addEventListener('click', () => {
-  window.location.reload();
+  window.location.href = '/menu/singleplayer/singleplayer.html';
 });
 
 // Back to menu button
