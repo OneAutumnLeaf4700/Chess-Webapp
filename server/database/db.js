@@ -8,8 +8,16 @@ const connectDB = async () => {
         });
         console.log('MongoDB connected...');
     } catch (err) {
-        console.error('MongoDB connection error:', err);
-        process.exit(1);
+        console.error('MongoDB connection error (continuing without DB):', err.message || err);
+        // Do not exit the process so singleplayer and non-DB features keep working
+        // Optionally, attempt a lazy reconnect in the background
+        setTimeout(() => {
+            mongoose.connect('mongodb://127.0.0.1:27017/chessGames', {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            }).then(() => console.log('MongoDB connected on retry...'))
+              .catch(() => {/* suppress repeated logs */});
+        }, 5000);
     }
 };
 
