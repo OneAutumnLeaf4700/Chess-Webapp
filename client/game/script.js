@@ -146,6 +146,27 @@ socket.on('opponentMove', (move) => {
   updateStatus(); //Update the game status
 });
 
+// Draw offer events
+socket.on('drawOffered', () => {
+  const accept = confirm('Opponent offered a draw. Accept?');
+  socket.emit('respondDraw', gameId, accept);
+});
+
+socket.on('drawDeclined', () => {
+  alert('Your draw offer was declined.');
+});
+
+socket.on('gameDrawn', () => {
+  $status.text('Draw agreed');
+  openGameEndPopup('Draw agreed');
+});
+
+// Resign events
+socket.on('opponentResigned', () => {
+  $status.text('Opponent resigned. You win!');
+  openGameEndPopup('Opponent resigned. You win!');
+});
+
 // Listen for the game over disconnect event
 socket.on('gameOverDisconnect', () => {
   gameOver = true;
@@ -267,6 +288,18 @@ function playSound(move) {
 function sendMoveToServer(gameId, gameState) {
   socket.emit('move', gameId, gameState); // Emit the move to the server
 }
+
+// Resign button
+document.getElementById('resign-btn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to resign?')) {
+    socket.emit('resign', gameId);
+  }
+});
+
+// Offer draw button
+document.getElementById('offer-draw-btn').addEventListener('click', () => {
+  socket.emit('offerDraw', gameId);
+});
 
 // Function to change piece theme
 function changePieceSet(set) {
