@@ -136,6 +136,9 @@ socket.on('notifyTurn', (turn) => {
 // Receive outcome change
 socket.on('outcomeChange', (outcome) => {
   $status.text(outcome);
+  if (outcome === 'checkmate' || outcome === 'draw') {
+    disableGameActions();
+  }
 });
 
 // Listen for the opponent's move
@@ -159,12 +162,14 @@ socket.on('drawDeclined', () => {
 socket.on('gameDrawn', () => {
   $status.text('Draw agreed');
   openGameEndPopup('Draw agreed');
+  disableGameActions();
 });
 
 // Resign events
 socket.on('opponentResigned', () => {
   $status.text('Opponent resigned. You win!');
   openGameEndPopup('Opponent resigned. You win!');
+  disableGameActions();
 });
 
 // Listen for the game over disconnect event
@@ -443,18 +448,21 @@ function updateStatus () {
   if (gameOver && opponentDisconnected) {
     status = 'Opponent disconnected, you win!'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // checkmate?
   if (game.in_checkmate()) {
     status = 'Game over, ' + moveColor + ' is in checkmate.'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // draw?
   else if (game.in_draw()) {
     status = 'Game over, drawn position'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // game still on
@@ -471,6 +479,13 @@ function updateStatus () {
   $fen.html(game.fen()) // Update the FEN label
   $pgn.html(game.pgn()) // Update the PGN label
   $gameId.html(gameId) // Update the game ID label
+}
+
+function disableGameActions() {
+  const resignBtn = document.getElementById('resign-btn');
+  const offerDrawBtn = document.getElementById('offer-draw-btn');
+  if (resignBtn) resignBtn.disabled = true;
+  if (offerDrawBtn) offerDrawBtn.disabled = true;
 }
 
 // -------------------------------

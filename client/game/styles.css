@@ -135,6 +135,11 @@ h1 {
     gap: 8px;
 }
 
+.actions .control-btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 label {
     font-weight: 600;
     color: var(--header-color);
