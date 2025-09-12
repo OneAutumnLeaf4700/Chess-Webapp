@@ -44,6 +44,14 @@ module.exports = (io) => {
         socket.emit('currentTurn', turn);
     }
 
+    // Emit the current turn to both players in a game
+    async function broadcastCurrentTurn(gameId) {
+        const turn = await lobbyManager.getCurrentTurn(gameId);
+        const players = gamePlayers[gameId] || {};
+        if (players.white) io.to(players.white).emit('currentTurn', turn);
+        if (players.black) io.to(players.black).emit('currentTurn', turn);
+    }
+
     // Sync Boards
     function syncBoard(socket, gameState) {
         socket.emit('syncBoard', gameState);
@@ -87,8 +95,8 @@ module.exports = (io) => {
         // Make the move on the remaining client sides
         makeMoveOnClientSide(socket, gameState.move);
 
-        //Update the turn on the client side
-        getCurrentTurn(io, gameId);
+        //Update the turn on the client side for both players
+        broadcastCurrentTurn(gameId);
     }
 
     // ---------------------------------
