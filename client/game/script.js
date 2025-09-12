@@ -138,6 +138,7 @@ socket.on('outcomeChange', (outcome) => {
   $status.text(outcome);
   if (outcome === 'checkmate' || outcome === 'draw') {
     disableGameActions();
+    showNewGameButton();
   }
 });
 
@@ -163,6 +164,7 @@ socket.on('gameDrawn', () => {
   $status.text('Draw agreed');
   openGameEndPopup('Draw agreed');
   disableGameActions();
+  showNewGameButton();
 });
 
 // Resign events
@@ -170,6 +172,7 @@ socket.on('opponentResigned', () => {
   $status.text('Opponent resigned. You win!');
   openGameEndPopup('Opponent resigned. You win!');
   disableGameActions();
+  showNewGameButton();
 });
 
 // Listen for the game over disconnect event
@@ -238,8 +241,9 @@ function syncBoard(serverGameState) {
 }
 
 // Request a board sync from the server 
-function requestBoardSync() {
-  socket.emit('requestBoardSync'); // Request a board sync
+function requestBoardSync(id) {
+  const gid = id || gameId;
+  socket.emit('requestBoardSync', gid);
 }
 
 // Determine which sound to play
@@ -314,7 +318,7 @@ function changePieceSet(set) {
   config.pieceTheme = newPieceTheme;
   board = Chessboard('myBoard', config);
   // Request a board sync from the server
-  requestBoardSync();
+  requestBoardSync(gameId);
 
   // Update Promotion Modal
   updatePromotionModal(set);
@@ -449,6 +453,7 @@ function updateStatus () {
     status = 'Opponent disconnected, you win!'
     openGameEndPopup(status);
     disableGameActions();
+    showNewGameButton();
   }
 
   // checkmate?
@@ -456,6 +461,7 @@ function updateStatus () {
     status = 'Game over, ' + moveColor + ' is in checkmate.'
     openGameEndPopup(status);
     disableGameActions();
+    showNewGameButton();
   }
 
   // draw?
@@ -463,6 +469,7 @@ function updateStatus () {
     status = 'Game over, drawn position'
     openGameEndPopup(status);
     disableGameActions();
+    showNewGameButton();
   }
 
   // game still on
@@ -486,6 +493,28 @@ function disableGameActions() {
   const offerDrawBtn = document.getElementById('offer-draw-btn');
   if (resignBtn) resignBtn.disabled = true;
   if (offerDrawBtn) offerDrawBtn.disabled = true;
+}
+
+function showNewGameButton() {
+  const newGameBtn = document.getElementById('new-game-btn');
+  if (newGameBtn) newGameBtn.style.display = 'inline-block';
+}
+
+// New Game handler: go back to main menu
+document.getElementById('new-game-btn').addEventListener('click', () => {
+  window.location.href = '/menu/mainmenu/mainmenu.html';
+});
+
+// Home button: resign current game then navigate home
+const homeLinkEl = document.querySelector('.home-link');
+if (homeLinkEl) {
+  homeLinkEl.addEventListener('click', (e) => {
+    e.preventDefault();
+    try { socket.emit('resign', gameId); } catch (err) {}
+    setTimeout(() => {
+      window.location.href = '/menu/mainmenu/mainmenu.html';
+    }, 100);
+  });
 }
 
 // -------------------------------
