@@ -136,6 +136,9 @@ socket.on('notifyTurn', (turn) => {
 // Receive outcome change
 socket.on('outcomeChange', (outcome) => {
   $status.text(outcome);
+  if (outcome === 'checkmate' || outcome === 'draw') {
+    disableGameActions();
+  }
 });
 
 // Listen for the opponent's move
@@ -144,6 +147,29 @@ socket.on('opponentMove', (move) => {
   board.position(game.fen()); //Update the board position
   playSound(move); // Play the corresponding sound
   updateStatus(); //Update the game status
+});
+
+// Draw offer events
+socket.on('drawOffered', () => {
+  const accept = confirm('Opponent offered a draw. Accept?');
+  socket.emit('respondDraw', gameId, accept);
+});
+
+socket.on('drawDeclined', () => {
+  alert('Your draw offer was declined.');
+});
+
+socket.on('gameDrawn', () => {
+  $status.text('Draw agreed');
+  openGameEndPopup('Draw agreed');
+  disableGameActions();
+});
+
+// Resign events
+socket.on('opponentResigned', () => {
+  $status.text('Opponent resigned. You win!');
+  openGameEndPopup('Opponent resigned. You win!');
+  disableGameActions();
 });
 
 // Listen for the game over disconnect event
@@ -267,6 +293,18 @@ function playSound(move) {
 function sendMoveToServer(gameId, gameState) {
   socket.emit('move', gameId, gameState); // Emit the move to the server
 }
+
+// Resign button
+document.getElementById('resign-btn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to resign?')) {
+    socket.emit('resign', gameId);
+  }
+});
+
+// Offer draw button
+document.getElementById('offer-draw-btn').addEventListener('click', () => {
+  socket.emit('offerDraw', gameId);
+});
 
 // Function to change piece theme
 function changePieceSet(set) {
@@ -410,18 +448,21 @@ function updateStatus () {
   if (gameOver && opponentDisconnected) {
     status = 'Opponent disconnected, you win!'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // checkmate?
   if (game.in_checkmate()) {
     status = 'Game over, ' + moveColor + ' is in checkmate.'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // draw?
   else if (game.in_draw()) {
     status = 'Game over, drawn position'
     openGameEndPopup(status);
+    disableGameActions();
   }
 
   // game still on
@@ -438,6 +479,13 @@ function updateStatus () {
   $fen.html(game.fen()) // Update the FEN label
   $pgn.html(game.pgn()) // Update the PGN label
   $gameId.html(gameId) // Update the game ID label
+}
+
+function disableGameActions() {
+  const resignBtn = document.getElementById('resign-btn');
+  const offerDrawBtn = document.getElementById('offer-draw-btn');
+  if (resignBtn) resignBtn.disabled = true;
+  if (offerDrawBtn) offerDrawBtn.disabled = true;
 }
 
 // -------------------------------
