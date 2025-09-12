@@ -2,8 +2,9 @@
 // Chess Initialization
 // --------------------------------
 
-// Connect to the server
-const socket = io();
+// Connect to the server (supports external backend)
+const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || '');
+const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
 
 //Get Game ID
 const path = window.location.pathname;
@@ -96,9 +97,21 @@ let game = new Chess();
 // Game Setup Request
 // --------------------------------
 
-// Notify the server to start tracking board activity
-console.log(userId, gameId);
-socket.emit('userConnected', userId, gameId);
+// If no gameId in URL, request a new multiplayer game, then redirect
+if (!gameId) {
+  if (!userId) {
+    console.error('Missing userId; cannot create game');
+  } else {
+    socket.emit('newMultiplayerGameRequested', userId);
+    socket.on('newMultiplayerGameCreated', (newId) => {
+      if (newId) window.location.href = `/game/${newId}`;
+    });
+  }
+} else {
+  // Notify the server to start tracking board activity for this game
+  console.log(userId, gameId);
+  socket.emit('userConnected', userId, gameId);
+}
 
 
 // -------------------------------
