@@ -164,6 +164,44 @@ module.exports = (io) => {
             handleMove(io, socket, gameId, gameState);
         });
 
+        // Offer draw
+        socket.on('offerDraw', async (gameId) => {
+            const players = gamePlayers[gameId] || {};
+            const opponentId = (players.white === socket.id) ? players.black : players.white;
+            if (opponentId) io.to(opponentId).emit('drawOffered');
+        });
+
+        // Respond to draw
+        socket.on('respondDraw', async (gameId, accepted) => {
+            const players = gamePlayers[gameId] || {};
+            const opponentId = (players.white === socket.id) ? players.black : players.white;
+            if (accepted) {
+                // Set outcome to draw
+                await lobbyManager.updateGameState(gameId, { turn: 'w', fen: (await lobbyManager.getGame(gameId)).gameState.fen, pgn: (await lobbyManager.getGame(gameId)).gameState.pgn, outcome: 'draw' });
+                if (players.white) io.to(players.white).emit('gameDrawn');
+                if (players.black) io.to(players.black).emit('gameDrawn');
+            } else if (opponentId) {
+                io.to(opponentId).emit('drawDeclined');
+            }
+        });
+
+        // Resign
+        socket.on('resign', async (gameId) => {
+            const players = gamePlayers[gameId] || {};
+            const opponentId = (players.white === socket.id) ? players.black : players.white;
+            // Mark outcome as checkmate-ish equivalent: opponent wins
+            const game = await lobbyManager.getGame(gameId);
+            const updated = {
+                turn: game.gameState.turn,
+                fen: game.gameState.fen,
+                pgn: game.gameState.pgn,
+                outcome: 'checkmate'
+            };
+            await lobbyManager.updateGameState(gameId, updated);
+            if (opponentId) io.to(opponentId).emit('opponentResigned');
+            socket.emit('opponentResigned');
+        });
+
         // Handle disconnecting player
         socket.on('disconnect', async () => {
             let disconnectedPlayerId = socket.id;
