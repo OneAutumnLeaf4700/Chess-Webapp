@@ -6,14 +6,15 @@
   ],
   "routes": [
     { "src": "^/$", "dest": "/client/menu/mainmenu/mainmenu.html" },
-    { "src": "^/(.*)$", "dest": "/client/$1" },
-    { "src": "^/game$", "dest": "/client/game/index.html" },
-    { "src": "^/game/(.*)$", "dest": "/client/game/index.html" },
-    { "src": "^/menu/(.*)$", "dest": "/client/menu/$1" },
+    { "src": "^/game/singleplayer.html$", "dest": "/client/game/singleplayer.html" },
+    { "src": "^/game/styles.css$", "dest": "/client/game/styles.css" },
+    { "src": "^/game/script.js$", "dest": "/client/game/script.js" },
     { "src": "^/audio/(.*)$", "dest": "/client/audio/$1" },
     { "src": "^/img/(.*)$", "dest": "/client/img/$1" },
-    { "src": "^/game/styles.css$", "dest": "/client/game/styles.css" },
-    { "src": "^/game/script.js$", "dest": "/client/game/script.js" }
+    { "src": "^/menu/(.*)$", "dest": "/client/menu/$1" },
+    { "src": "^/game/([A-Za-z0-9\-]+)$", "dest": "/client/game/index.html" },
+    { "src": "^/(.*)$", "dest": "/client/$1" },
+    { "src": "^/game$", "dest": "/client/game/index.html" }
   ]
 }
 
