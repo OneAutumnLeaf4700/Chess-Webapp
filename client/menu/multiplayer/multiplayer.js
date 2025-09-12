@@ -1,6 +1,6 @@
 import { getUserId } from './userIdManager.js';
 
-const socket = io();
+// Initialize socket lazily only on the game page; here we will navigate only
 
 // ---------------------------------
 // User ID Management
@@ -28,7 +28,7 @@ const errorMessage = document.getElementById('error-message');
 // Event listener for creating a game
 createGameButton.addEventListener('click', () => {
     console.log('Create game');
-    socket.emit('newMultiplayerGameRequested', userId);
+    window.location.href = '/game';
 });
 
 // Open the join game modal with overlay effect
@@ -50,7 +50,8 @@ joinGameConfirmButton.addEventListener('click', () => {
         return;
     }
 
-    socket.emit('joinGameRequested', userId, gameId);
+    // Navigate to the game shell; it will handle joining via URL
+    window.location.href = `/game/${gameId}`;
 });
 
 // Close the modal when "Cancel" is clicked
@@ -71,23 +72,5 @@ window.addEventListener('click', (event) => {
 // Socket.io events
 // --------------------------------
 
-socket.on('newMultiplayerGameCreated', (gameId) => {
-    if (!gameId) {
-        console.error('Received null or undefined gameId for new multiplayer game.');
-        return;
-    }
-    console.log(`Redirecting to game with ID: ${gameId}`);
-    window.location.href = `/game/${gameId}`; // Redirect to the game page
-});
-
-socket.on('joinGameReplied', (gameId) => {
-    if (!gameId) {
-        console.error('Received null or undefined gameId for join game.');
-        errorMessage.textContent = 'Failed to join game. Please try again.';
-        errorMessage.style.display = 'block';
-        return;
-    }
-    console.log(`Joining game with ID: ${gameId}`);
-    window.location.href = `/game/${gameId}`; // Redirect to the game page
-});
+// Socket interactions handled on game page
 

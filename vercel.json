@@ -1,20 +1,19 @@
 {
   "version": 2,
-  "public": true,
   "builds": [
     { "src": "client/**", "use": "@vercel/static" }
   ],
-  "routes": [
-    { "src": "^/$", "dest": "/client/menu/mainmenu/mainmenu.html" },
-    { "src": "^/game/singleplayer.html$", "dest": "/client/game/singleplayer.html" },
-    { "src": "^/game/styles.css$", "dest": "/client/game/styles.css" },
-    { "src": "^/game/script.js$", "dest": "/client/game/script.js" },
-    { "src": "^/audio/(.*)$", "dest": "/client/audio/$1" },
-    { "src": "^/img/(.*)$", "dest": "/client/img/$1" },
-    { "src": "^/menu/(.*)$", "dest": "/client/menu/$1" },
-    { "src": "^/game/([A-Za-z0-9\-]+)$", "dest": "/client/game/index.html" },
-    { "src": "^/(.*)$", "dest": "/client/$1" },
-    { "src": "^/game$", "dest": "/client/game/index.html" }
+  "rewrites": [
+    { "source": "/", "destination": "/client/menu/mainmenu/mainmenu.html" },
+    { "source": "/menu/:path*", "destination": "/client/menu/:path*" },
+    { "source": "/audio/:path*", "destination": "/client/audio/:path*" },
+    { "source": "/img/:path*", "destination": "/client/img/:path*" },
+    { "source": "/game/singleplayer.html", "destination": "/client/game/singleplayer.html" },
+    { "source": "/game/styles.css", "destination": "/client/game/styles.css" },
+    { "source": "/game/script.js", "destination": "/client/game/script.js" },
+    { "source": "/game/:id", "destination": "/client/game/index.html" },
+    { "source": "/game", "destination": "/client/game/index.html" },
+    { "source": "/:path*", "destination": "/client/:path*" }
   ]
 }
 
