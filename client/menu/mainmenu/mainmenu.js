@@ -1,5 +1,5 @@
-// Initialize the socket connection
-const socket = io();
+// Socket is not needed on the main menu; avoid errors on static hosting
+// (Vercel won't serve /socket.io here)
 
 const singlePlayerButton = document.getElementById('singleplayer-btn');
 const multiPlayerButton = document.getElementById('multiplayer-btn');
@@ -16,7 +16,7 @@ function redirectSingleplayer() {
 
 // Redirect to multiplayer game
 function redirectMultiplayer() {
-    window.location.href = '/multiplayer';
+    window.location.href = '/menu/multiplayer/multiplayer.html';
 }
 
 
