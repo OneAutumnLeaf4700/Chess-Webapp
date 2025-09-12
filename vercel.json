@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "public": true,
+  "builds": [
+    { "src": "client/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "^/$", "dest": "/client/menu/mainmenu/mainmenu.html" },
+    { "src": "^/(.*)$", "dest": "/client/$1" },
+    { "src": "^/game$", "dest": "/client/game/index.html" },
+    { "src": "^/game/(.*)$", "dest": "/client/game/index.html" },
+    { "src": "^/menu/(.*)$", "dest": "/client/menu/$1" },
+    { "src": "^/audio/(.*)$", "dest": "/client/audio/$1" },
+    { "src": "^/img/(.*)$", "dest": "/client/img/$1" },
+    { "src": "^/game/styles.css$", "dest": "/client/game/styles.css" },
+    { "src": "^/game/script.js$", "dest": "/client/game/script.js" }
+  ]
+}
+
+
