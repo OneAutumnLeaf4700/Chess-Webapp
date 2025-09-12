@@ -52,9 +52,14 @@ module.exports = (io) => {
         if (players.black) io.to(players.black).emit('currentTurn', turn);
     }
 
-    // Sync Boards
-    function syncBoard(socket, gameState) {
-        socket.emit('syncBoard', gameState);
+    // Sync Boards: send current server game state to this socket
+    async function syncBoard(socket, gameId) {
+        try {
+            const game = await lobbyManager.getGame(gameId);
+            socket.emit('syncBoard', game.gameState);
+        } catch (e) {
+            // no-op if game missing
+        }
     }
 
     // Handle the connection (or Reconnection) of a new player 
