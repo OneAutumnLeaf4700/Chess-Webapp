@@ -9,6 +9,7 @@
     { "source": "/audio/:path*", "destination": "/client/audio/:path*" },
     { "source": "/img/:path*", "destination": "/client/img/:path*" },
     { "source": "/game/singleplayer.html", "destination": "/client/game/singleplayer.html" },
+    { "source": "/game/singleplayer.js", "destination": "/client/game/singleplayer.js" },
     { "source": "/game/styles.css", "destination": "/client/game/styles.css" },
     { "source": "/game/script.js", "destination": "/client/game/script.js" },
     { "source": "/game/:id", "destination": "/client/game/index.html" },
