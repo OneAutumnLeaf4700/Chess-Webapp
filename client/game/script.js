@@ -111,6 +111,8 @@ if (!gameId) {
   // Notify the server to start tracking board activity for this game
   console.log(userId, gameId);
   socket.emit('userConnected', userId, gameId);
+  // Request board sync to load game data
+  requestBoardSync(gameId);
 }
 
 
