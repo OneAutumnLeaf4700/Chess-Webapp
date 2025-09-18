@@ -104,7 +104,13 @@ if (!gameId) {
   } else {
     socket.emit('newMultiplayerGameRequested', userId);
     socket.on('newMultiplayerGameCreated', (newId) => {
-      if (newId) window.location.href = `/game/${newId}`;
+      if (newId) {
+        // Update the game ID display before redirecting
+        if (gameIdValue) {
+          gameIdValue.textContent = newId;
+        }
+        window.location.href = `/game/${newId}`;
+      }
     });
   }
 } else {
@@ -113,6 +119,10 @@ if (!gameId) {
   socket.emit('userConnected', userId, gameId);
   // Request board sync to load game data
   requestBoardSync(gameId);
+  // Ensure game ID is displayed
+  if (gameIdValue) {
+    gameIdValue.textContent = gameId;
+  }
 }
 
 
@@ -662,6 +672,34 @@ document.getElementById('copyGameId').addEventListener('click', () => {
   }).catch(err => {
     console.error('Failed to copy Game ID:', err);
   });
+});
+
+// Share Game Functionality
+document.getElementById('shareGameId').addEventListener('click', () => {
+  const gameId = document.getElementById('game-id').innerText;
+  const gameUrl = `${window.location.origin}/game/${gameId}`;
+  
+  if (navigator.share) {
+    // Use native share API if available
+    navigator.share({
+      title: 'Chess Game',
+      text: `Join my chess game! Game ID: ${gameId}`,
+      url: gameUrl
+    }).catch(err => {
+      console.log('Error sharing:', err);
+      // Fallback to clipboard
+      navigator.clipboard.writeText(gameUrl);
+      alert('Game URL copied to clipboard!');
+    });
+  } else {
+    // Fallback to clipboard
+    navigator.clipboard.writeText(gameUrl).then(() => {
+      alert('Game URL copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy game URL:', err);
+      alert('Game ID: ' + gameId);
+    });
+  }
 });
 
 // Change piece set to Lichess
