@@ -142,12 +142,18 @@ if (!gameId || gameId === '') {
   // Notify the server to start tracking board activity for this game
   console.log('Connecting to existing game:', { userId, gameId });
   socket.emit('userConnected', userId, gameId);
-  // Request board sync to load game data
-  requestBoardSync(gameId);
   // Ensure game ID is displayed
   if (gameIdValue) {
     gameIdValue.textContent = gameId;
   }
+  
+  // Wait for team assignment before syncing board
+  socket.on('teamAssignment', (team) => {
+    console.log('Team assigned on reload:', team);
+    teamAssignment(team);
+    // Now sync the board with the correct team
+    requestBoardSync(gameId);
+  });
 }
 
 
@@ -221,6 +227,13 @@ socket.on('gameDrawn', () => {
 socket.on('opponentResigned', () => {
   $status.text('Opponent resigned. You win!');
   openGameEndPopup('Opponent resigned. You win!');
+  disableGameActions();
+  showNewGameButton();
+});
+
+socket.on('youResigned', () => {
+  $status.text('You resigned. You lose!');
+  openGameEndPopup('You resigned. You lose!');
   disableGameActions();
   showNewGameButton();
 });
@@ -398,8 +411,11 @@ function changePieceSet(set) {
   // Update the chessboard
   config.pieceTheme = newPieceTheme;
   board = Chessboard('myBoard', config);
-  // Request a board sync from the server
-  requestBoardSync(gameId);
+  
+  // Sync board after piece set change to maintain position
+  if (gameId) {
+    requestBoardSync(gameId);
+  }
 
   // Update Promotion Modal
   updatePromotionModal(set);

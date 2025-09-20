@@ -112,6 +112,11 @@ module.exports = (io) => {
             await syncBoard(socket, gameId);
             await broadcastCurrentTurn(gameId);
             
+            // Force a board sync to ensure latest position is loaded
+            setTimeout(async () => {
+                await syncBoard(socket, gameId);
+            }, 100);
+            
             console.log(`Player ${userId} joined as ${team} to game ${gameId}`);
         } catch (error) {
             console.error('Error in handleConnection:', error);
@@ -318,7 +323,7 @@ module.exports = (io) => {
                 await lobbyManager.updateGameState(gameId, updated);
                 
                 if (opponentId) io.to(opponentId).emit('opponentResigned');
-                socket.emit('opponentResigned');
+                socket.emit('youResigned');
                 console.log(`Player ${currentUserId} resigned in game ${gameId}`);
             } catch (error) {
                 console.error('Error handling resignation:', error);
