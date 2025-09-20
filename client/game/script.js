@@ -11,7 +11,7 @@ const path = window.location.pathname;
 let gameId = path.split('/')[2];
 
 // Fallback: try to get game ID from URL hash or query params
-if (!gameId) {
+if (!gameId || gameId === '') {
   const hash = window.location.hash.substring(1);
   const urlParams = new URLSearchParams(window.location.search);
   gameId = hash || urlParams.get('gameId') || urlParams.get('id');
@@ -40,7 +40,7 @@ if (!userId) {
 }
 
 // Initialize game ID label
-if (gameId && gameIdValue) {
+if (gameId && gameId !== '' && gameIdValue) {
   gameIdValue.textContent = gameId;
   console.log('Game ID set to:', gameId);
 } else {
@@ -113,7 +113,7 @@ let game = new Chess();
 // --------------------------------
 
 // If no gameId in URL, request a new multiplayer game, then redirect
-if (!gameId) {
+if (!gameId || gameId === '') {
   if (!userId) {
     console.error('Missing userId; cannot create game');
   } else {
