@@ -6,10 +6,13 @@ mongoose.set('strictQuery', true);
 
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/chessGames', {
+        // Use environment variable for MongoDB URL, fallback to localhost
+        const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/chessGames';
+        
+        await mongoose.connect(mongoUrl, {
             // Modern driver options
-            serverSelectionTimeoutMS: 2000, // fail fast if Mongo isn't available
-            directConnection: true,
+            serverSelectionTimeoutMS: 5000, // fail fast if Mongo isn't available
+            bufferCommands: false, // Disable mongoose buffering
         });
         console.log('MongoDB connected...');
     } catch (err) {
@@ -17,12 +20,13 @@ const connectDB = async () => {
         // Do not exit the process so singleplayer and non-DB features keep working
         // Optionally, attempt a lazy reconnect in the background
         setTimeout(() => {
-            mongoose.connect('mongodb://127.0.0.1:27017/chessGames', {
-                serverSelectionTimeoutMS: 2000,
-                directConnection: true,
+            const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/chessGames';
+            mongoose.connect(mongoUrl, {
+                serverSelectionTimeoutMS: 5000,
+                bufferCommands: false,
             }).then(() => console.log('MongoDB connected on retry...'))
               .catch(() => {/* suppress repeated logs */});
-        }, 5000);
+        }, 10000);
     }
 
     mongoose.connection.on('error', (e) => {
