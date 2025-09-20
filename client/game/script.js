@@ -8,8 +8,22 @@ const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
 
 //Get Game ID
 const path = window.location.pathname;
-const gameId = path.split('/')[2];
+let gameId = path.split('/')[2];
+
+// Fallback: try to get game ID from URL hash or query params
+if (!gameId) {
+  const hash = window.location.hash.substring(1);
+  const urlParams = new URLSearchParams(window.location.search);
+  gameId = hash || urlParams.get('gameId') || urlParams.get('id');
+}
+
 const gameIdValue = document.getElementById('game-id');
+
+console.log('Current path:', path);
+console.log('Current hash:', window.location.hash);
+console.log('Current search:', window.location.search);
+console.log('Extracted gameId:', gameId);
+console.log('gameIdValue element:', gameIdValue);
 
 // Get popup elements
 const gameEndPopup = document.getElementById("game-end-popup");
@@ -28,8 +42,9 @@ if (!userId) {
 // Initialize game ID label
 if (gameId && gameIdValue) {
   gameIdValue.textContent = gameId;
+  console.log('Game ID set to:', gameId);
 } else {
-  console.error('Game ID not found in URL or element missing!');
+  console.error('Game ID not found in URL or element missing!', {gameId, gameIdValue});
 }
 
 
