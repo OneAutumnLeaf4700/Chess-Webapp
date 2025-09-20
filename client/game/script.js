@@ -2,7 +2,7 @@
 // Chess Initialization
 // --------------------------------
 
-// Connect to the server (supports external backend)
+// Connect to the server (Render backend)
 const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || 'https://chess-webapp-backend.onrender.com');
 const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
 
@@ -19,11 +19,12 @@ if (!gameId || gameId === '') {
 
 const gameIdValue = document.getElementById('game-id');
 
-console.log('Current path:', path);
-console.log('Current hash:', window.location.hash);
-console.log('Current search:', window.location.search);
-console.log('Extracted gameId:', gameId);
-console.log('gameIdValue element:', gameIdValue);
+// Debug logging (can be removed in production)
+// console.log('Current path:', path);
+// console.log('Current hash:', window.location.hash);
+// console.log('Current search:', window.location.search);
+// console.log('Extracted gameId:', gameId);
+// console.log('gameIdValue element:', gameIdValue);
 
 // Get popup elements
 const gameEndPopup = document.getElementById("game-end-popup");
@@ -44,7 +45,7 @@ if (gameId && gameId !== '' && gameIdValue) {
   gameIdValue.textContent = gameId;
   console.log('Game ID set to:', gameId);
 } else {
-  console.error('Game ID not found in URL or element missing!', {gameId, gameIdValue});
+  console.warn('Game ID not found in URL - will be set when game is created');
 }
 
 
