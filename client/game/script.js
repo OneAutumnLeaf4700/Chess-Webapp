@@ -121,7 +121,9 @@ if (!gameId || gameId === '') {
   } else {
     console.log('Emitting newMultiplayerGameRequested with userId:', userId);
     socket.emit('newMultiplayerGameRequested', userId);
-    socket.on('newMultiplayerGameCreated', (newId) => {
+    
+    // Use once() to prevent multiple listeners
+    socket.once('newMultiplayerGameCreated', (newId) => {
       console.log('Received newMultiplayerGameCreated with gameId:', newId);
       if (newId) {
         // Update the game ID display before redirecting
@@ -138,7 +140,7 @@ if (!gameId || gameId === '') {
   }
 } else {
   // Notify the server to start tracking board activity for this game
-  console.log(userId, gameId);
+  console.log('Connecting to existing game:', { userId, gameId });
   socket.emit('userConnected', userId, gameId);
   // Request board sync to load game data
   requestBoardSync(gameId);
