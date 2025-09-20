@@ -30,8 +30,10 @@ dbHandler();
 ioHandler(io);
 
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../client')));
+// Serve static files - adjust path for Render deployment
+const clientPath = path.join(__dirname, '../client');
+console.log('Client path:', clientPath);
+app.use(express.static(clientPath));
 
 console.log("Main Directory: " + __dirname);
 
