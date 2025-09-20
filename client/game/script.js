@@ -3,7 +3,7 @@
 // --------------------------------
 
 // Connect to the server (Render backend)
-const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || 'https://chess-webapp-backend.onrender.com');
+const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || 'https://chess-webapp-4cpr.onrender.com');
 const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
 
 //Get Game ID
@@ -20,11 +20,11 @@ if (!gameId || gameId === '') {
 const gameIdValue = document.getElementById('game-id');
 
 // Debug logging (can be removed in production)
-// console.log('Current path:', path);
-// console.log('Current hash:', window.location.hash);
-// console.log('Current search:', window.location.search);
-// console.log('Extracted gameId:', gameId);
-// console.log('gameIdValue element:', gameIdValue);
+console.log('Current path:', path);
+console.log('Current hash:', window.location.hash);
+console.log('Current search:', window.location.search);
+console.log('Extracted gameId:', gameId);
+console.log('gameIdValue element:', gameIdValue);
 
 // Get popup elements
 const gameEndPopup = document.getElementById("game-end-popup");
@@ -115,17 +115,24 @@ let game = new Chess();
 
 // If no gameId in URL, request a new multiplayer game, then redirect
 if (!gameId || gameId === '') {
+  console.log('No gameId found, creating new multiplayer game...');
   if (!userId) {
     console.error('Missing userId; cannot create game');
   } else {
+    console.log('Emitting newMultiplayerGameRequested with userId:', userId);
     socket.emit('newMultiplayerGameRequested', userId);
     socket.on('newMultiplayerGameCreated', (newId) => {
+      console.log('Received newMultiplayerGameCreated with gameId:', newId);
       if (newId) {
         // Update the game ID display before redirecting
         if (gameIdValue) {
           gameIdValue.textContent = newId;
+          console.log('Game ID displayed:', newId);
         }
+        console.log('Redirecting to:', `/game/${newId}`);
         window.location.href = `/game/${newId}`;
+      } else {
+        console.error('Received null gameId from server');
       }
     });
   }
