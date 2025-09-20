@@ -162,7 +162,9 @@ module.exports = (io) => {
         // Creating a new multiplayer game
         socket.on('newMultiplayerGameRequested', async (userId) => {
             try {
+                console.log('Creating new multiplayer game for userId:', userId);
                 const gameId = await createMultiplayerGame(userId); // Get the game ID of the created game
+                console.log('Game created successfully with ID:', gameId);
                 socket.emit('newMultiplayerGameCreated', gameId); // Emit the game ID to the client
             } catch (error) {
                 console.error('Error creating multiplayer game:', error);
