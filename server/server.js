@@ -20,8 +20,8 @@ const io = socket(server, {
     }
 });
 
-// Use port info from config file
-const port = 3000;
+// Use port from environment variable or default to 3000
+const port = process.env.PORT || 3000;
 
 //MongoDB Database Setup
 dbHandler();
