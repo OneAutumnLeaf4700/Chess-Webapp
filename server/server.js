@@ -13,7 +13,12 @@ const dbHandler = require('./database/db');
 // App and Server Setup
 const app = express();
 const server = http.createServer(app);
-const io = socket(server);
+const io = socket(server, {
+    cors: {
+        origin: "*", // Allow all origins for now
+        methods: ["GET", "POST"]
+    }
+});
 
 // Use port info from config file
 const port = 3000;
