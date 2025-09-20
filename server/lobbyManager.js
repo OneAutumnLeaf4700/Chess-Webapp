@@ -57,7 +57,7 @@ async function joinGame(userId, gameId) {
       game.players.push({ userId, color: newColor });
       inMemoryGames.set(gameId, game);
       console.log('Game updated in memory:', gameId);
-      return gameId;
+      return newColor; // Return the team color instead of gameId
     }
 
     const game = await Game.findOne({ gameId });
@@ -74,7 +74,7 @@ async function joinGame(userId, gameId) {
     game.players.push({ userId, color: newColor });
     await game.save();
     console.log('Game updated successfully:', game);
-    return game.gameId;
+    return newColor; // Return the team color instead of gameId
   } catch (error) {
     console.error('Error joining game:', error.message);
     throw error;

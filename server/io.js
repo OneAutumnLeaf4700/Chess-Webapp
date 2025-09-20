@@ -74,10 +74,30 @@ module.exports = (io) => {
                 return;
             }
             
-            // Get player team
-            const team = await lobbyManager.getPlayerTeam(userId, gameId);
+            // Check if player is already in this game
+            const existingTeam = await lobbyManager.getPlayerTeam(userId, gameId);
+            if (existingTeam) {
+                console.log(`Player ${userId} already in game ${gameId} as ${existingTeam}`);
+                
+                // Update socket mapping
+                if (!gamePlayers[gameId]) {
+                    gamePlayers[gameId] = {};
+                }
+                gamePlayers[gameId][existingTeam] = socket.id;
+                
+                // Send existing data to client
+                socket.emit('teamAssignment', existingTeam);
+                await syncBoard(socket, gameId);
+                await broadcastCurrentTurn(gameId);
+                
+                console.log(`Player ${userId} reconnected as ${existingTeam} to game ${gameId}`);
+                return;
+            }
+            
+            // Player not in game, add them
+            const team = await lobbyManager.joinGame(userId, gameId);
             if (!team) {
-                socket.emit('error', 'Player not found in game');
+                socket.emit('error', 'Failed to join game');
                 return;
             }
             
@@ -92,7 +112,7 @@ module.exports = (io) => {
             await syncBoard(socket, gameId);
             await broadcastCurrentTurn(gameId);
             
-            console.log(`Player ${userId} connected as ${team} to game ${gameId}`);
+            console.log(`Player ${userId} joined as ${team} to game ${gameId}`);
         } catch (error) {
             console.error('Error in handleConnection:', error);
             socket.emit('error', 'Failed to connect to game');
