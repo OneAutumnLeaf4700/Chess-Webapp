@@ -3,7 +3,7 @@
 // --------------------------------
 
 // Connect to the server (supports external backend)
-const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || '');
+const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || 'https://chess-webapp-backend.onrender.com');
 const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
 
 //Get Game ID
