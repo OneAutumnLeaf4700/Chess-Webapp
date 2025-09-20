@@ -237,24 +237,55 @@ socket.on('gameOverDisconnect', () => {
 
 //Assign the user a team
 function teamAssignment(team) {
+  console.log('Team assigned:', team);
   myColor = team;
   config.orientation = team;
   board = Chessboard('myBoard', config);
+  
+  // Initialize turn indicator
+  const turnIndicator = document.getElementById('turn-indicator');
+  if (turnIndicator) {
+    turnIndicator.textContent = `You are playing as ${team}`;
+    turnIndicator.className = 'turn-indicator';
+  }
 }
 
 //Assign the user a turn
 function turnAssignment(currentTurn) {
+  console.log('turnAssignment called:', { myColor, currentTurn });
+  
   if (!myColor) {
-    console.log(myColor);
+    console.log('Color not assigned yet:', myColor);
     console.error('Color not assigned yet');
     return;
   }
+  
   isTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
+  console.log('Turn assignment result:', { isTurn, myColor, currentTurn });
+  updateTurnIndicator(currentTurn);
 }
 
 //Notify change in turn 
 function notifyTurn(turn) {
   isTurn = (myColor === 'white' && turn === 'w') || (myColor === 'black' && turn === 'b');
+  updateTurnIndicator(turn);
+}
+
+// Update the turn indicator display
+function updateTurnIndicator(currentTurn) {
+  const turnIndicator = document.getElementById('turn-indicator');
+  if (!turnIndicator || !myColor) return;
+  
+  const isMyTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
+  const turnText = currentTurn === 'w' ? 'White' : 'Black';
+  
+  if (isMyTurn) {
+    turnIndicator.textContent = `Your turn (${turnText})`;
+    turnIndicator.className = 'turn-indicator your-turn';
+  } else {
+    turnIndicator.textContent = `Opponent's turn (${turnText})`;
+    turnIndicator.className = 'turn-indicator opponent-turn';
+  }
 }
 
 // Sync the board with the server's 
@@ -396,18 +427,28 @@ function checkOutcome(game) {
 
 // Function for handling drag events
 function onDragStart(source, piece, position, orientation) {
+    console.log('onDragStart called:', { source, piece, isTurn, myColor, gameOver: game.game_over() });
+    
     // Do not pick up pieces if the game is over
-    if (game.game_over() || isPromotionModalOpen) return false;
+    if (game.game_over() || isPromotionModalOpen) {
+      console.log('Drag blocked: game over or promotion modal open');
+      return false;
+    }
   
     //Do not allow interaction if not the player's turn
-    if (!isTurn) return false;
+    if (!isTurn) {
+      console.log('Drag blocked: not player turn');
+      return false;
+    }
   
     // Prevent picking up opponent's pieces
     if ((myColor === 'black' && piece.search(/^w/) !== -1) || 
         (myColor === 'white' && piece.search(/^b/) !== -1)) {
+      console.log('Drag blocked: opponent piece');
       return false;
     }
   
+    console.log('Drag allowed');
     return true;
   }
   
