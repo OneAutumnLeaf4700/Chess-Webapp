@@ -266,6 +266,12 @@ socket.on('gameOverDisconnect', () => {
   updateStatus();
 });
 
+// Listen for server errors
+socket.on('error', (errorMessage) => {
+  console.error('Server error:', errorMessage);
+  alert(errorMessage);
+});
+
 
 // -------------------------------
 // Socket Functions

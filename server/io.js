@@ -239,6 +239,14 @@ module.exports = (io) => {
                     return;
                 }
                 
+                // Check if both players have joined
+                const players = gamePlayers[gameId] || {};
+                const bothPlayersJoined = players.white && players.black;
+                if (!bothPlayersJoined) {
+                    socket.emit('error', 'Wait for opponent to join before making moves');
+                    return;
+                }
+                
                 // Validate game state
                 if (!gameState || !gameState.fen || !gameState.pgn) {
                     socket.emit('error', 'Invalid move data');
