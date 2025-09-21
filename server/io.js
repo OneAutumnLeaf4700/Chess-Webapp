@@ -48,16 +48,22 @@ module.exports = (io) => {
     async function broadcastCurrentTurn(gameId) {
         const turn = await lobbyManager.getCurrentTurn(gameId);
         const players = gamePlayers[gameId] || {};
-        if (players.white) io.to(players.white).emit('currentTurn', turn);
-        if (players.black) io.to(players.black).emit('currentTurn', turn);
+        const bothPlayersJoined = players.white && players.black;
+        
+        if (players.white) io.to(players.white).emit('currentTurn', turn, bothPlayersJoined);
+        if (players.black) io.to(players.black).emit('currentTurn', turn, bothPlayersJoined);
     }
 
     // Sync Boards: send current server game state to this socket
     async function syncBoard(socket, gameId) {
         try {
             const game = await lobbyManager.getGame(gameId);
-            socket.emit('syncBoard', game.gameState);
+            if (game && game.gameState) {
+                console.log(`Syncing board for game ${gameId}:`, game.gameState);
+                socket.emit('syncBoard', game.gameState);
+            }
         } catch (e) {
+            console.error('Error syncing board:', e);
             // no-op if game missing
         }
     }
@@ -312,6 +318,9 @@ module.exports = (io) => {
                 const players = gamePlayers[gameId] || {};
                 const opponentId = (players.white === socket.id) ? players.black : players.white;
                 
+                // Get the resigning player's color
+                const resigningPlayerColor = (players.white === socket.id) ? 'white' : 'black';
+                
                 // Mark outcome as checkmate (opponent wins)
                 const game = await lobbyManager.getGame(gameId);
                 const updated = {
@@ -322,9 +331,16 @@ module.exports = (io) => {
                 };
                 await lobbyManager.updateGameState(gameId, updated);
                 
-                if (opponentId) io.to(opponentId).emit('opponentResigned');
-                socket.emit('youResigned');
-                console.log(`Player ${currentUserId} resigned in game ${gameId}`);
+                // Send resign message to both players
+                if (opponentId) {
+                    io.to(opponentId).emit('opponentResigned', resigningPlayerColor);
+                }
+                socket.emit('youResigned', resigningPlayerColor);
+                
+                // Also broadcast to all players in the game to ensure message is received
+                if (players.white) io.to(players.white).emit('gameEnded', 'resignation', resigningPlayerColor);
+                if (players.black) io.to(players.black).emit('gameEnded', 'resignation', resigningPlayerColor);
+                console.log(`Player ${currentUserId} (${resigningPlayerColor}) resigned in game ${gameId}`);
             } catch (error) {
                 console.error('Error handling resignation:', error);
                 socket.emit('error', 'Failed to resign');

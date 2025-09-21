@@ -168,8 +168,8 @@ socket.on('teamAssignment', (team) => {
 });
 
 // Listen for the turnAssignment event from the server
-socket.on('currentTurn', (currentTurn) => {
-  turnAssignment(currentTurn); 
+socket.on('currentTurn', (currentTurn, bothPlayersJoined) => {
+  turnAssignment(currentTurn, bothPlayersJoined); 
 });
 
 // Sync the board with the server's FEN
@@ -224,18 +224,39 @@ socket.on('gameDrawn', () => {
 });
 
 // Resign events
-socket.on('opponentResigned', () => {
-  $status.text('Opponent resigned. You win!');
-  openGameEndPopup('Opponent resigned. You win!');
+socket.on('opponentResigned', (resigningPlayerColor) => {
+  const colorText = resigningPlayerColor === 'white' ? 'White' : 'Black';
+  $status.text(`${colorText} resigned. You win!`);
+  openGameEndPopup(`${colorText} resigned. You win!`);
   disableGameActions();
   showNewGameButton();
 });
 
-socket.on('youResigned', () => {
-  $status.text('You resigned. You lose!');
-  openGameEndPopup('You resigned. You lose!');
+socket.on('youResigned', (resigningPlayerColor) => {
+  const colorText = resigningPlayerColor === 'white' ? 'White' : 'Black';
+  $status.text(`You resigned as ${colorText}. You lose!`);
+  openGameEndPopup(`You resigned as ${colorText}. You lose!`);
   disableGameActions();
   showNewGameButton();
+});
+
+// Handle game end events (for resignations before first move)
+socket.on('gameEnded', (reason, resigningPlayerColor) => {
+  if (reason === 'resignation') {
+    const colorText = resigningPlayerColor === 'white' ? 'White' : 'Black';
+    const isMyResignation = (myColor === 'white' && resigningPlayerColor === 'white') || 
+                           (myColor === 'black' && resigningPlayerColor === 'black');
+    
+    if (isMyResignation) {
+      $status.text(`You resigned as ${colorText}. You lose!`);
+      openGameEndPopup(`You resigned as ${colorText}. You lose!`);
+    } else {
+      $status.text(`${colorText} resigned. You win!`);
+      openGameEndPopup(`${colorText} resigned. You win!`);
+    }
+    disableGameActions();
+    showNewGameButton();
+  }
 });
 
 // Listen for the game over disconnect event
@@ -266,8 +287,8 @@ function teamAssignment(team) {
 }
 
 //Assign the user a turn
-function turnAssignment(currentTurn) {
-  console.log('turnAssignment called:', { myColor, currentTurn });
+function turnAssignment(currentTurn, bothPlayersJoined) {
+  console.log('turnAssignment called:', { myColor, currentTurn, bothPlayersJoined });
   
   if (!myColor) {
     console.log('Color not assigned yet:', myColor);
@@ -277,7 +298,7 @@ function turnAssignment(currentTurn) {
   
   isTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
   console.log('Turn assignment result:', { isTurn, myColor, currentTurn });
-  updateTurnIndicator(currentTurn);
+  updateTurnIndicator(currentTurn, bothPlayersJoined);
 }
 
 //Notify change in turn 
@@ -287,9 +308,15 @@ function notifyTurn(turn) {
 }
 
 // Update the turn indicator display
-function updateTurnIndicator(currentTurn) {
+function updateTurnIndicator(currentTurn, bothPlayersJoined) {
   const turnIndicator = document.getElementById('turn-indicator');
   if (!turnIndicator || !myColor) return;
+  
+  if (!bothPlayersJoined) {
+    turnIndicator.textContent = 'Waiting for opponent...';
+    turnIndicator.className = 'turn-indicator waiting';
+    return;
+  }
   
   const isMyTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
   const turnText = currentTurn === 'w' ? 'White' : 'Black';
@@ -309,17 +336,24 @@ function syncBoard(serverGameState) {
   turnAssignment(gameState.turn);
     
   if (!serverGameState || !gameState.fen || !gameState.pgn) {
+    console.log('Invalid game state received:', serverGameState);
     return;
   }
 
   try {
+    // Load the game state
     game.load(gameState.fen);
     board.position(game.fen);
+    
+    // Update the status display
+    updateStatus();
     
     // Dynamically update the content of FEN and Status divs
     document.getElementById('fen').innerText = gameState.fen || ''; // Placeholder text
     document.getElementById('status').innerText = gameState.outcome || 'Game in Progress';  // Placeholder text
     document.getElementById('pgn').innerText = gameState.pgn || ''; // Placeholder text
+    
+    console.log('Board synced successfully with FEN:', gameState.fen);
   }
   catch (error) {
     //Error msgs
@@ -408,12 +442,20 @@ document.getElementById('offer-draw-btn').addEventListener('click', () => {
 function changePieceSet(set) {
   const newPieceTheme = `../img/chesspieces/${set}/{piece}.png`;
 
+  // Store current position before changing piece set
+  const currentPosition = game.fen();
+
   // Update the chessboard
   config.pieceTheme = newPieceTheme;
   board = Chessboard('myBoard', config);
   
-  // Sync board after piece set change to maintain position
-  if (gameId) {
+  // Restore the position after board recreation
+  if (currentPosition && currentPosition !== 'start') {
+    game.load(currentPosition);
+    board.position(currentPosition);
+    updateStatus();
+  } else if (gameId) {
+    // If no current position, sync with server
     requestBoardSync(gameId);
   }
 
