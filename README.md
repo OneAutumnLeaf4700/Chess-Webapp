@@ -84,6 +84,11 @@ Server will run at `http://localhost:3000` and serve the client.
 - Multiplayer: `http://localhost:3000/multiplayer`
 - Shareable game URL: `http://localhost:3000/game/{gameId}`
 
+## Play Online
+- Hosted: `https://chess-webapp-4cpr.onrender.com`
+- Note: cold starts can take up to ~1 minute for the server to spin up
+- Testing on one machine: open different browsers (e.g., Chrome + Firefox + Edge) for each player. The app relies on browser storage/cache to identify users, so separate browsers (or separate profiles) are required for distinct identities.
+
 ## Important Socket Events
 - Server → Client
   - `teamAssignment(team)` → "white" or "black"
