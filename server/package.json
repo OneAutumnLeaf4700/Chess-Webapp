@@ -1,20 +1,25 @@
 {
-  "name": "server",
+  "name": "chess-webapp-server",
   "version": "1.0.0",
+  "description": "Express + Socket.IO backend for the Chess Webapp",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --coverage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OneAutumnLeaf4700/Chess-Webapp"
+  },
+  "author": "Rayyan",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.21.2",
-    "http": "^0.0.1-security",
     "mongoose": "^8.12.2",
-    "path": "^0.12.7",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }

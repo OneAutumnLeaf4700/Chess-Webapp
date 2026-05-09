@@ -12,5 +12,11 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Stray pager artifacts
-et GIT_PAGER=cat
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Test / coverage artifacts
+coverage/
+.nyc_output/
