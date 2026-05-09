@@ -29,11 +29,7 @@ module.exports = (io) => {
 
     // Handle player assignment and send turn assignment notification to user
     async function getPlayerTeam(socket, userId, gameId) {
-        console.log('Getting player team');
-        console.log('User ID:', userId);
-        console.log('Game ID:', gameId);
         const team = await lobbyManager.getPlayerTeam(userId, gameId);
-        console.log('Player team:', team);
         socket.emit('teamAssignment', team);
     }
     
@@ -58,7 +54,6 @@ module.exports = (io) => {
         try {
             const game = await lobbyManager.getGame(gameId);
             if (game && game.gameState) {
-                console.log(`Syncing board for game ${gameId}:`, game.gameState);
                 socket.emit('syncBoard', game.gameState);
             }
         } catch (e) {
@@ -70,7 +65,6 @@ module.exports = (io) => {
     // Handle the connection (or Reconnection) of a new player 
     async function handleConnection(socket, userId, gameId) {
         try {
-            console.log(`Handling connection for user ${userId} to game ${gameId}`);
             
             // Verify game exists
             const game = await lobbyManager.getGame(gameId);
@@ -82,7 +76,6 @@ module.exports = (io) => {
             // Check if player is already in this game
             const existingTeam = await lobbyManager.getPlayerTeam(userId, gameId);
             if (existingTeam) {
-                console.log(`Player ${userId} already in game ${gameId} as ${existingTeam}`);
                 
                 // Update socket mapping
                 if (!gamePlayers[gameId]) {
@@ -95,7 +88,6 @@ module.exports = (io) => {
                 await syncBoard(socket, gameId);
                 await broadcastCurrentTurn(gameId);
                 
-                console.log(`Player ${userId} reconnected as ${existingTeam} to game ${gameId}`);
                 return;
             }
             
@@ -122,7 +114,6 @@ module.exports = (io) => {
                 await syncBoard(socket, gameId);
             }, 100);
             
-            console.log(`Player ${userId} joined as ${team} to game ${gameId}`);
         } catch (error) {
             console.error('Error in handleConnection:', error);
             socket.emit('error', 'Failed to connect to game');
@@ -138,7 +129,6 @@ module.exports = (io) => {
     async function handleMove(io, socket, gameId, gameState) {
         //Save new data
         const game = await lobbyManager.updateGameState(gameId, gameState);
-        console.log('Game state updated:', game);
 
         // Make the move on the remaining client sides
         makeMoveOnClientSide(socket, gameState.move);
@@ -176,7 +166,6 @@ module.exports = (io) => {
                 socket.gameId = gameId;
                 
                 if (gamePlayers[gameId] && (gamePlayers[gameId].white === socket.id || gamePlayers[gameId].black === socket.id)) {
-                    console.log(`Player ${userId} reconnected to game ${gameId}`);
                     // Re-sync the board for reconnected player
                     await syncBoard(socket, gameId);
                 } else {
@@ -192,9 +181,7 @@ module.exports = (io) => {
         // Creating a new multiplayer game
         socket.on('newMultiplayerGameRequested', async (userId) => {
             try {
-                console.log('Creating new multiplayer game for userId:', userId);
                 const gameId = await createMultiplayerGame(userId); // Get the game ID of the created game
-                console.log('Game created successfully with ID:', gameId);
                 socket.emit('newMultiplayerGameCreated', gameId); // Emit the game ID to the client
             } catch (error) {
                 console.error('Error creating multiplayer game:', error);
@@ -271,7 +258,6 @@ module.exports = (io) => {
                 const opponentId = (players.white === socket.id) ? players.black : players.white;
                 if (opponentId) {
                     io.to(opponentId).emit('drawOffered');
-                    console.log(`Draw offered in game ${gameId} by ${currentUserId}`);
                 }
             } catch (error) {
                 console.error('Error offering draw:', error);
@@ -303,10 +289,8 @@ module.exports = (io) => {
                     
                     if (players.white) io.to(players.white).emit('gameDrawn');
                     if (players.black) io.to(players.black).emit('gameDrawn');
-                    console.log(`Game ${gameId} ended in draw`);
                 } else if (opponentId) {
                     io.to(opponentId).emit('drawDeclined');
-                    console.log(`Draw declined in game ${gameId} by ${currentUserId}`);
                 }
             } catch (error) {
                 console.error('Error responding to draw:', error);
@@ -347,7 +331,6 @@ module.exports = (io) => {
                 // Also broadcast to all players in the game to ensure message is received
                 if (players.white) io.to(players.white).emit('gameEnded', 'resignation', resigningPlayerColor);
                 if (players.black) io.to(players.black).emit('gameEnded', 'resignation', resigningPlayerColor);
-                console.log(`Player ${currentUserId} (${resigningPlayerColor}) resigned in game ${gameId}`);
             } catch (error) {
                 console.error('Error handling resignation:', error);
                 socket.emit('error', 'Failed to resign');
@@ -358,7 +341,6 @@ module.exports = (io) => {
         socket.on('disconnect', async () => {
             try {
                 const disconnectedPlayerId = socket.id;
-                console.log(`Player ${currentUserId} disconnected from socket ${disconnectedPlayerId}`);
                 
                 // Find which game the player was in
                 for (const gameId in gamePlayers) {
@@ -370,14 +352,12 @@ module.exports = (io) => {
                         // Notify only the opponent, not all users
                         if (opponentId) {
                             io.to(opponentId).emit('opponentDisconnected');
-                            console.log(`Notified opponent in game ${gameId} of disconnection`);
                         }
             
                         // Remove player from tracking but keep game alive for reconnection
                         // Only delete if both players are gone
                         if (!opponentId) {
                             delete gamePlayers[gameId];
-                            console.log(`Game ${gameId} deleted - no players remaining`);
                         } else {
                             // Remove only the disconnected player
                             if (players.white === disconnectedPlayerId) {
@@ -385,7 +365,6 @@ module.exports = (io) => {
                             } else {
                                 delete players.black;
                             }
-                            console.log(`Player removed from game ${gameId}, game remains active`);
                         }
                         break;
                     }

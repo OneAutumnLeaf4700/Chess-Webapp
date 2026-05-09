@@ -8,7 +8,6 @@ import { getUserId } from './userIdManager.js';
 
 // Retrieve the user ID
 const userId = getUserId();
-console.log('User ID:', userId);
 
 // ---------------------------------
 // Button and Modal Elements
@@ -27,7 +26,6 @@ const errorMessage = document.getElementById('error-message');
 
 // Event listener for creating a game
 createGameButton.addEventListener('click', () => {
-    console.log('Create game');
     window.location.href = '/game';
 });
 

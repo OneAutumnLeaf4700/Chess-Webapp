@@ -20,11 +20,6 @@ if (!gameId || gameId === '') {
 const gameIdValue = document.getElementById('game-id');
 
 // Debug logging (can be removed in production)
-console.log('Current path:', path);
-console.log('Current hash:', window.location.hash);
-console.log('Current search:', window.location.search);
-console.log('Extracted gameId:', gameId);
-console.log('gameIdValue element:', gameIdValue);
 
 // Get popup elements
 const gameEndPopup = document.getElementById("game-end-popup");
@@ -43,7 +38,6 @@ if (!userId) {
 // Initialize game ID label
 if (gameId && gameId !== '' && gameIdValue) {
   gameIdValue.textContent = gameId;
-  console.log('Game ID set to:', gameId);
 } else {
   console.warn('Game ID not found in URL - will be set when game is created');
 }
@@ -115,23 +109,18 @@ let game = new Chess();
 
 // If no gameId in URL, request a new multiplayer game, then redirect
 if (!gameId || gameId === '') {
-  console.log('No gameId found, creating new multiplayer game...');
   if (!userId) {
     console.error('Missing userId; cannot create game');
   } else {
-    console.log('Emitting newMultiplayerGameRequested with userId:', userId);
     socket.emit('newMultiplayerGameRequested', userId);
     
     // Use once() to prevent multiple listeners
     socket.once('newMultiplayerGameCreated', (newId) => {
-      console.log('Received newMultiplayerGameCreated with gameId:', newId);
       if (newId) {
         // Update the game ID display before redirecting
         if (gameIdValue) {
           gameIdValue.textContent = newId;
-          console.log('Game ID displayed:', newId);
         }
-        console.log('Redirecting to:', `/game/${newId}`);
         window.location.href = `/game/${newId}`;
       } else {
         console.error('Received null gameId from server');
@@ -140,7 +129,6 @@ if (!gameId || gameId === '') {
   }
 } else {
   // Notify the server to start tracking board activity for this game
-  console.log('Connecting to existing game:', { userId, gameId });
   socket.emit('userConnected', userId, gameId);
   // Ensure game ID is displayed
   if (gameIdValue) {
@@ -149,7 +137,6 @@ if (!gameId || gameId === '') {
   
   // Wait for team assignment before syncing board
   socket.on('teamAssignment', (team) => {
-    console.log('Team assigned on reload:', team);
     teamAssignment(team);
     // Now sync the board with the correct team
     requestBoardSync(gameId);
@@ -163,7 +150,6 @@ if (!gameId || gameId === '') {
 
 //Listen for team from the server
 socket.on('teamAssignment', (team) => {
-  console.log('Team assigning:', team);
   teamAssignment(team);
 });
 
@@ -279,7 +265,6 @@ socket.on('error', (errorMessage) => {
 
 //Assign the user a team
 function teamAssignment(team) {
-  console.log('Team assigned:', team);
   myColor = team;
   config.orientation = team;
   board = Chessboard('myBoard', config);
@@ -294,16 +279,13 @@ function teamAssignment(team) {
 
 //Assign the user a turn
 function turnAssignment(currentTurn, bothPlayersJoined) {
-  console.log('turnAssignment called:', { myColor, currentTurn, bothPlayersJoined });
   
   if (!myColor) {
-    console.log('Color not assigned yet:', myColor);
     console.error('Color not assigned yet');
     return;
   }
   
   isTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
-  console.log('Turn assignment result:', { isTurn, myColor, currentTurn });
   updateTurnIndicator(currentTurn, bothPlayersJoined);
 }
 
@@ -342,7 +324,6 @@ function syncBoard(serverGameState) {
   turnAssignment(gameState.turn);
     
   if (!serverGameState || !gameState.fen || !gameState.pgn) {
-    console.log('Invalid game state received:', serverGameState);
     return;
   }
 
@@ -359,13 +340,10 @@ function syncBoard(serverGameState) {
     document.getElementById('status').innerText = gameState.outcome || 'Game in Progress';  // Placeholder text
     document.getElementById('pgn').innerText = gameState.pgn || ''; // Placeholder text
     
-    console.log('Board synced successfully with FEN:', gameState.fen);
   }
   catch (error) {
     //Error msgs
     console.error('Error loading position:', error);
-    console.log('Attempted to load FEN:', gameState.fen);
-    console.log('Attempted to load PGN:', gameState.pgn);
 
     // Handle errors by updating the status
     document.getElementById('status').innerText = 'Error loading position';
@@ -493,28 +471,23 @@ function checkOutcome(game) {
 
 // Function for handling drag events
 function onDragStart(source, piece, position, orientation) {
-    console.log('onDragStart called:', { source, piece, isTurn, myColor, gameOver: game.game_over() });
     
     // Do not pick up pieces if the game is over
     if (game.game_over() || isPromotionModalOpen) {
-      console.log('Drag blocked: game over or promotion modal open');
       return false;
     }
   
     //Do not allow interaction if not the player's turn
     if (!isTurn) {
-      console.log('Drag blocked: not player turn');
       return false;
     }
   
     // Prevent picking up opponent's pieces
     if ((myColor === 'black' && piece.search(/^w/) !== -1) || 
         (myColor === 'white' && piece.search(/^b/) !== -1)) {
-      console.log('Drag blocked: opponent piece');
       return false;
     }
   
-    console.log('Drag allowed');
     return true;
   }
   
@@ -758,7 +731,7 @@ document.getElementById('darkTheme').addEventListener('click', () => {
 //Play sound on first interaction to unlock future sound playback
 document.addEventListener('click', () => {
   userInteracted = true;
-  sounds.initialSilence.play().catch(error => console.log("Audio playback blocked:", error));
+  sounds.initialSilence.play().catch(error => console.warn("Audio playback blocked:", error));
 }, { once: true });
 
 
@@ -816,7 +789,6 @@ document.getElementById('shareGameId').addEventListener('click', () => {
       text: `Join my chess game! Game ID: ${gameId}`,
       url: gameUrl
     }).catch(err => {
-      console.log('Error sharing:', err);
       // Fallback to clipboard
       navigator.clipboard.writeText(gameUrl);
       alert('Game URL copied to clipboard!');

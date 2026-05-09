@@ -26,12 +26,10 @@ function redirectMultiplayer() {
 //---------------------------------
 
 singlePlayerButton.addEventListener('click', () => {
-    console.log('Starting Single Player Game...');
     redirectSingleplayer();
 });
 
 multiPlayerButton.addEventListener('click', () => {
-    console.log('Starting Multiplayer Game...');
     redirectMultiplayer();
 });
 

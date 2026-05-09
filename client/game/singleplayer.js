@@ -570,7 +570,7 @@ document.getElementById('darkTheme').addEventListener('click', () => {
 //Play sound on first interaction to unlock future sound playback
 document.addEventListener('click', () => {
   userInteracted = true;
-  sounds.initialSilence.play().catch(error => console.log("Audio playback blocked:", error));
+  sounds.initialSilence.play().catch(error => console.warn("Audio playback blocked:", error));
 }, { once: true });
 
 // FEN copy functionality

@@ -27,20 +27,17 @@ async function createMultiplayerGame(userId) {
 
   if (!isDbConnected()) {
     inMemoryGames.set(gameId, { ...gameObject });
-    console.log('Game created in memory (DB offline):', gameId);
     return gameId;
   }
 
   const newGame = new Game(gameObject);
   const savedGame = await newGame.save();
-  console.log('Game saved successfully:', savedGame);
   return savedGame.gameId;
 }
 
 // Function to join an existing game
 async function joinGame(userId, gameId) {
   try {
-    console.log('Attempting to join game with ID:', gameId);
 
     if (!isDbConnected()) {
       const game = inMemoryGames.get(gameId);
@@ -56,7 +53,6 @@ async function joinGame(userId, gameId) {
       const newColor = existingColors.includes('white') ? 'black' : 'white';
       game.players.push({ userId, color: newColor });
       inMemoryGames.set(gameId, game);
-      console.log('Game updated in memory:', gameId);
       return newColor; // Return the team color instead of gameId
     }
 
@@ -73,7 +69,6 @@ async function joinGame(userId, gameId) {
     const newColor = existingColors.includes('white') ? 'black' : 'white';
     game.players.push({ userId, color: newColor });
     await game.save();
-    console.log('Game updated successfully:', game);
     return newColor; // Return the team color instead of gameId
   } catch (error) {
     console.error('Error joining game:', error.message);
@@ -161,7 +156,6 @@ async function handleDisconnect(gameId) {
     if (!isDbConnected()) {
       const existed = inMemoryGames.delete(gameId);
       if (existed) {
-        console.log(`In-memory game ${gameId} deleted.`);
         return true;
       }
       console.error(`Game with ID ${gameId} not found.`);
@@ -174,7 +168,6 @@ async function handleDisconnect(gameId) {
       return null;
     }
     await Game.deleteOne({ gameId });
-    console.log(`Game with ID ${gameId} has been deleted successfully.`);
     return true;
   } catch (error) {
     console.error(`Error deleting game: ${error.message}`);
