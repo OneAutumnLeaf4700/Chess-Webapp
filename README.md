@@ -1,6 +1,15 @@
 # Chess Webapp
 
+[![Tests](https://github.com/OneAutumnLeaf4700/Chess-Webapp/actions/workflows/tests.yml/badge.svg)](https://github.com/OneAutumnLeaf4700/Chess-Webapp/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Modern, real-time chess playable in the browser. Supports multiplayer lobbies, robust board sync, resign/draw flows, theme switching, and sound. Built with Socket.IO, Express, and Chess.js/Chessboard.js.
+
+**Live demo:** https://chess-webapp-4cpr.onrender.com (cold starts may take ~1 minute on the free tier)
+
+<!-- TODO: replace with a screenshot or short GIF of two browsers playing a multiplayer game -->
+<!-- ![Demo](docs/demo.png) -->
+
 
 ## Highlights
 - **Multiplayer lobbies** with unique game IDs
@@ -51,12 +60,12 @@ server/
   database/
     db.js
     dbschema.js
-  chess.js-0.13.4/
   config.js
   io.js
   lobbyManager.js
   routes.js
   server.js
+  tests/                     # Jest unit + integration tests
 ```
 
 ## Prerequisites
@@ -120,5 +129,16 @@ Server will run at `http://localhost:3000` and serve the client.
 - Board state updates and turn changes are persisted on the server (DB or memory)
 - Piece-set/theme changes do not alter the game state
 
+## Testing
+Server-side tests run with [Jest](https://jestjs.io/) and use Mongoose mocks so the in-memory fallback paths are exercised without a real database.
+
+```bash
+cd server
+npm install
+npm test          # runs all tests with coverage
+```
+
+CI runs the same `npm test` on every push to `master` and on every pull request via the [Tests workflow](.github/workflows/tests.yml).
+
 ## License
-MIT
+[MIT](LICENSE) © 2026 Rayyan
