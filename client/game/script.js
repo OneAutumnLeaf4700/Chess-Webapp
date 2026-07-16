@@ -2,9 +2,12 @@
 // Chess Initialization
 // --------------------------------
 
-// Connect to the server (Render backend)
-const SOCKET_ENDPOINT = (window.SOCKET_ENDPOINT || localStorage.getItem('backendUrl') || 'https://chess-webapp-4cpr.onrender.com');
-const socket = SOCKET_ENDPOINT ? io(SOCKET_ENDPOINT) : io();
+// Connect to whichever origin served this page. The server already serves
+// both the client and the Socket.IO endpoint from the same origin
+// (see server.js), so this works unmodified in local dev and in
+// production. Set window.SOCKET_ENDPOINT before this script runs only if
+// the client is ever hosted separately from the backend.
+const socket = window.SOCKET_ENDPOINT ? io(window.SOCKET_ENDPOINT) : io();
 
 //Get Game ID
 const path = window.location.pathname;
@@ -155,7 +158,7 @@ socket.on('teamAssignment', (team) => {
 
 // Listen for the turnAssignment event from the server
 socket.on('currentTurn', (currentTurn, bothPlayersJoined) => {
-  turnAssignment(currentTurn, bothPlayersJoined); 
+  turnAssignment(currentTurn, bothPlayersJoined);
 });
 
 // Sync the board with the server's FEN
@@ -277,29 +280,41 @@ function teamAssignment(team) {
   }
 }
 
+// Whether both players have joined, per the last authoritative 'currentTurn'
+// event from the server. syncBoard/notifyTurn re-render the turn indicator
+// without knowing this (they only carry the board's turn, not lobby state),
+// so they fall back to this remembered value instead of treating "unknown"
+// as "not joined" — otherwise every board re-sync (which happens on a
+// delayed re-sync after joining, and after every move) would incorrectly
+// flip the indicator back to "Waiting for opponent...".
+let lastKnownBothPlayersJoined = false;
+
 //Assign the user a turn
 function turnAssignment(currentTurn, bothPlayersJoined) {
-  
   if (!myColor) {
     console.error('Color not assigned yet');
     return;
   }
-  
+
+  if (bothPlayersJoined !== undefined) {
+    lastKnownBothPlayersJoined = bothPlayersJoined;
+  }
+
   isTurn = (myColor === 'white' && currentTurn === 'w') || (myColor === 'black' && currentTurn === 'b');
-  updateTurnIndicator(currentTurn, bothPlayersJoined);
+  updateTurnIndicator(currentTurn, lastKnownBothPlayersJoined);
 }
 
-//Notify change in turn 
+//Notify change in turn
 function notifyTurn(turn) {
   isTurn = (myColor === 'white' && turn === 'w') || (myColor === 'black' && turn === 'b');
-  updateTurnIndicator(turn);
+  updateTurnIndicator(turn, lastKnownBothPlayersJoined);
 }
 
 // Update the turn indicator display
 function updateTurnIndicator(currentTurn, bothPlayersJoined) {
   const turnIndicator = document.getElementById('turn-indicator');
   if (!turnIndicator || !myColor) return;
-  
+
   if (!bothPlayersJoined) {
     turnIndicator.textContent = 'Waiting for opponent...';
     turnIndicator.className = 'turn-indicator waiting';

@@ -43,8 +43,8 @@ module.exports = (io) => {
     async function broadcastCurrentTurn(gameId) {
         const turn = await lobbyManager.getCurrentTurn(gameId);
         const players = gamePlayers[gameId] || {};
-        const bothPlayersJoined = players.white && players.black;
-        
+        const bothPlayersJoined = Boolean(players.white && players.black);
+
         if (players.white) io.to(players.white).emit('currentTurn', turn, bothPlayersJoined);
         if (players.black) io.to(players.black).emit('currentTurn', turn, bothPlayersJoined);
     }
@@ -227,7 +227,7 @@ module.exports = (io) => {
                 
                 // Check if both players have joined
                 const players = gamePlayers[gameId] || {};
-                const bothPlayersJoined = players.white && players.black;
+                const bothPlayersJoined = Boolean(players.white && players.black);
                 if (!bothPlayersJoined) {
                     socket.emit('error', 'Wait for opponent to join before making moves');
                     return;
