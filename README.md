@@ -7,9 +7,7 @@ Modern, real-time chess playable in the browser. Supports multiplayer lobbies, r
 
 **Live demo:** https://chess-webapp-4cpr.onrender.com (cold starts may take ~1 minute on the free tier)
 
-<!-- TODO: replace with a screenshot or short GIF of two browsers playing a multiplayer game -->
-<!-- ![Demo](docs/demo.png) -->
-
+![Gameplay screenshot](docs/screenshots/banner.png)
 
 ## Highlights
 - **Multiplayer lobbies** with unique game IDs
