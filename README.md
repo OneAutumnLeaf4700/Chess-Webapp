@@ -9,6 +9,14 @@ Modern, real-time chess playable in the browser. Supports multiplayer lobbies, r
 
 ![Gameplay screenshot](docs/screenshots/banner.png)
 
+## Why I built this
+
+I wanted a real-time multiplayer project that couldn't fake correctness — chess has enough state
+(turns, check/checkmate, castling rights, draw conditions) that client-side bugs show up
+immediately as a broken game. That made it a good vehicle for practicing authoritative
+server-side state: the server owns FEN/PGN/outcome, clients render it and never trust their own
+local state on reconnect or resync.
+
 ## Highlights
 - **Multiplayer lobbies** with unique game IDs
 - **Move gating**: First player cannot move until both players have joined
